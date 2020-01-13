@@ -1,14 +1,10 @@
 const express = require("express");
-const app = express();
-const port = 3030;
+const bodyParser = require("body-parser");
+app.use(bodyParser.json()); // client sending data to server
 
+const app = express();
+const PORT = 3030;
 const users = [
-  {
-    id: 1,
-    username: "agus",
-    email: "agus@email.com",
-    password: "1234"
-  },
   {
     id: 1,
     username: "agus",
@@ -36,11 +32,27 @@ const users = [
 ];
 
 app.get("/", (req, res) => {
-  res.status(200).send("Hello World!");
+  console.log("tes");
+  return res.status(200).send("<h1>Hello World!</h1>");
 });
 
 app.get("/users", (req, res) => {
-  res.status(200).send(users);
+  console.log(req.query);
+  const { username, password } = req.query;
+  if (username && password) {
+    let newUser = users.filter(val => val.username === username && val.password === password);
+    newUser.length === 0 ? res.status(404).send("User not found!") : res.status(200).send(newUser);
+  } else if (username || password) {
+    let newUser = users.filter(val => val.username === username || val.password === password);
+    newUser.length === 0 ? res.status(404).send("User not found!") : res.status(200).send(newUser);
+  } else {
+    return res.status(200).send(users);
+  }
 });
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.post("/users", (req, res) => {
+  console.log(req.body);
+  return res.status(200).send("Successful!");
+});
+
+app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`));
